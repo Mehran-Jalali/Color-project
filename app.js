@@ -11,8 +11,15 @@ const lockButton = document.querySelectorAll(`.lock`);
 let initialColors;
 
 //Add eventlisteners
+generateBtn.addEventListener("click", randomColors);
 sliders.forEach((slider) => {
   slider.addEventListener("input", hslControl);
+});
+
+lockButton.forEach((button, index) => {
+  button.addEventListener("click", (e) => {
+    lockLayer(e, index);
+  });
 });
 
 colorDivs.forEach((div, index) => {
@@ -50,12 +57,17 @@ function generateHex() {
 
 function randomColors() {
   initialColors = [];
+
   colorDivs.forEach((div, index) => {
     const hexText = div.children[0];
     const randomColor = generateHex();
     //push the first hextext to initialColors
-    initialColors.push(chroma(randomColor).hex());
-
+    if (div.classList.contains(`locked`)) {
+      initialColors.push(hexText.innerText);
+      return;
+    } else {
+      initialColors.push(chroma(randomColor).hex());
+    }
     //Add the color to background
     div.style.backgroundColor = randomColor;
     hexText.innerText = randomColor;
@@ -192,6 +204,17 @@ function copyToClipboard(hex) {
 }
 function openAdjustmentPanel(index) {
   sliderContainer[index].classList.toggle(`active`);
+}
+function lockLayer(e, index) {
+  const lockSVG = e.target.children[0];
+  const activeBg = colorDivs[index];
+  activeBg.classList.toggle("locked");
+
+  if (lockSVG.classList.contains("fa-lock-open")) {
+    e.target.innerHTML = '<i class="fas fa-lock"></i>';
+  } else {
+    e.target.innerHTML = '<i class="fas fa-lock-open"></i>';
+  }
 }
 
 randomColors();
